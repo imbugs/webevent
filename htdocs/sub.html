@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="/js/sub.js"></script>
+
+	<title>Keyboard Event Node.JS Socket.io</title>
+</head>
+<body>
+<script>
+	$(document).ready(function(){
+		$('#sub').subevent();	
+		$('#sub').keypress(function(e){
+			onEvent("keypress:"+e.keyCode);
+		});
+		$('#sub').keydown(function(e){
+			onEvent("keydown:"+e.keyCode);
+		});
+		$('#sub').keyup(function(e){
+			onEvent("keyup:"+e.keyCode);
+		});
+		$('#sub').click(function(e){
+			onEvent('click');
+		});
+		$('#sub').dblclick(function(e){
+			onEvent('dblclick');
+		});
+		$('#sub').mouseup(function(e){
+			onEvent('mouseup');
+		});
+		$('#sub').mousedown(function(e){
+			onEvent('mousedown');
+		});
+	});
+	function onEvent(msg){
+		$('#sub').val(msg);
+		$('#his').append('<br>'+msg);
+	}
+</script>
+RECV EVENT <input id='sub'></input>
+<br>
+RECV HISTORY<div id='his'></div>
+</body>
+

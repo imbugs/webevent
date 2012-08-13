@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="/js/pub.js"></script>
+
+	<title>Keyboard Event Node.JS Socket.io</title>
+</head>
+<body>
+<script>
+	$(document).ready(function() {
+		$('#pub').pubevent();
+	});
+</script>
+SEND EVENT <input id='pub'></input>
+</body>
+
