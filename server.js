@@ -1,10 +1,26 @@
 (function() {
-	var extend = require('node.extend');
-	var htdocs = __dirname + "/htdocs";
-	var port = 8080;
+	Object.defineProperties(Array.prototype, {
+		add: {value: function add(value) {
+			return -1 == this.indexOf(value) && !!this.push(value);
+		}},
+		has: {value: function has(value) {
+			return -1 < this.indexOf(value);
+		}},
+		del: {value: function del(value) {
+			var i = this.indexOf(value);
+			return -1 < i && !!this.splice(i, 1);
+		}}
+	});
+}).call(this);
+
+(function() {
+	var extend  = require('node.extend');
 	var connect = require('connect');
 
-	var status = {online: []};
+	var htdocs = __dirname + "/htdocs";
+	var port = 8080;
+
+	var status = {sockets : new Array()};
 
 	var server = connect.createServer(
 		connect.static(htdocs)
@@ -16,8 +32,12 @@
 	var io = require('socket.io').listen(server);
 
 	io.sockets.on('connection', function(socket) {
-		var address = socket.handshake.address;
-		status.online.push(address);
+		status.sockets.add(socket);
+		console.log("Conn长度"+status.sockets.length);
+		socket.on('disconnect', function(){
+			status.sockets.del(socket);
+			console.log("DisConn长度"+status.sockets.length);
+		});
 
 		socket.on('event_keydown', function (data) {
 			socket.broadcast.emit('event_keydown', data);
@@ -41,13 +61,20 @@
 			socket.broadcast.emit('event_mouseup', data);
 		});
 		socket.on('query_status', function(data) {
+			// query server status，type=[online],response=query_status_{type}
 			data = extend({type: null}, data);
 			var emitName = 'query_status';
+			var query = {online: []};
+console.log("Query长度"+status.sockets.length);
+			for (var idx in status.sockets) {
+				var s = status.sockets[idx];
+				query.online.push(s.handshake.address);
+			}
 			if (data.type != null) {
 				emitName += '_' + data.type;
-				socket.emit(emitName, status[data.type]);
+				socket.emit(emitName, query[data.type]);
 			} else {
-				socket.emit(emitName, status);
+				socket.emit(emitName, query);
 			}
 		});
 		socket.on('register_event', function (registration) {
