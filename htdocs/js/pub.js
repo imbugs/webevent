@@ -28,6 +28,9 @@
 		$.fn.extend({ 
 			socket: function() {
 				return socket;
+			},
+			query: function() {
+				socket.emit('query_status', {type: 'online'});
 			}
 		});	
 
@@ -39,12 +42,9 @@
 			mouse(elem);
 		}
 
-//		if (options.status) {
-			status();
-//		}
+		status();
 
 		function status() {
-			socket.emit('query_status', {type: 'online'});
 			socket.on('query_status_online',function(data){
 				console.log(data);
 			});
