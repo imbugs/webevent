@@ -13,7 +13,13 @@
 	$(document).ready(function() {
 		$('#pub').pubevent();
 	});
+	function broadcast() {
+		var msg = $('#msg').val();
+		$('#pub').broadcast(msg);
+	}
 </script>
-SEND EVENT <input id='pub'></input>
+Send Event <input id='pub'></input>
+<br>
+<input id='msg'></input> <input type='button' onclick='javascript:broadcast()' value='Broadcast'></input>
 </body>
 

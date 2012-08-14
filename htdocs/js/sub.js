@@ -17,6 +17,7 @@
 				},2000);
 			}
 		});
+
 		socket.on('connect', function(){
 			if(reconnect > 0) {
 				clearInterval(reconnect);
@@ -25,9 +26,16 @@
 			}
 		});
 
+		socket.on('broadcast', function(data) {
+			$(elem).trigger('broadcast', data);
+		});
+		
 		$.fn.extend({
 			socket: function() {
 				return socket;
+			},
+			broadcast: function(fn) {
+				this.bind('broadcast', fn);
 			}
 		});	
 		

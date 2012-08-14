@@ -31,6 +31,9 @@
 			},
 			query: function() {
 				socket.emit('query_status', {type: 'online'});
+			},
+			broadcast: function(data) {
+				socket.emit('broadcast', data);
 			}
 		});	
 

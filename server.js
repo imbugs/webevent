@@ -1,5 +1,6 @@
 /*
  * Webevent Server
+ * @author imbugs
  */
 (function() {
 	Object.defineProperties(Array.prototype, {
@@ -56,16 +57,23 @@
 				regSocket.broadcast.emit(name, data);
 			});
 		}
+
+		// keyboard events
 		broadcast('event_keydown', socket);
 		broadcast('event_keyup', socket);
 		broadcast('event_keypress', socket);
+
+		// mouse events
 		broadcast('event_click', socket);
 		broadcast('event_dblclick', socket);
 		broadcast('event_mousedown', socket);
 		broadcast('event_mouseup', socket);
 		
+		// common broadcast message
+		broadcast('broadcast', socket);
+		
+		// query server status，type=[online],response=query_status_{type}
 		socket.on('query_status', function(data) {
-			// query server status，type=[online],response=query_status_{type}
 			try {
 				data = extend({type: null}, data);
 				var emitName = 'query_status';
@@ -85,6 +93,8 @@
 				console.log(err);
 			}
 		});
+
+		// customer events
 		socket.on('register_event', function (registration) {
 			registration = extend({name:null, broadcast:true, handler:null}, registration);
 			console.log("[HTTP server] register event name=" + registration.name + ",broadcast=" + registration.broadcast);

@@ -33,14 +33,17 @@
 		$('#sub').mousedown(function(e){
 			onEvent('mousedown');
 		});
+		$('#sub').broadcast(function(e, data){
+			onEvent('MsgRecv:' + data);
+		});
 	});
 	function onEvent(msg){
 		$('#sub').val(msg);
 		$('#his').append('<br>'+msg);
 	}
 </script>
-RECV EVENT <input id='sub'></input>
+Recv Event <input id='sub'></input>
 <br>
-RECV HISTORY<div id='his'></div>
+Recv History <div id='his'></div>
 </body>
 
