@@ -1,3 +1,6 @@
+/*
+ * Webevent Server
+ */
 (function() {
 	Object.defineProperties(Array.prototype, {
 		add: {value: function add(value) {
@@ -33,53 +36,59 @@
 
 	io.sockets.on('connection', function(socket) {
 		status.sockets.add(socket);
-		console.log("Conn长度"+status.sockets.length);
+		console.log("[HTTP server] connect " + getAddress(socket,true));
 		socket.on('disconnect', function(){
 			status.sockets.del(socket);
-			console.log("DisConn长度"+status.sockets.length);
+			console.log("[HTTP server] disconnect " + getAddress(socket,true));
 		});
 
-		socket.on('event_keydown', function (data) {
-			socket.broadcast.emit('event_keydown', data);
-		});
-		socket.on('event_keyup', function (data) {
-			socket.broadcast.emit('event_keyup', data);
-		});
-		socket.on('event_keypress', function (data) {
-			socket.broadcast.emit('event_keypress', data);
-		});
-		socket.on('event_click', function (data) {
-			socket.broadcast.emit('event_click', data);
-		});
-		socket.on('event_dblclick', function (data) {
-			socket.broadcast.emit('event_dblclick', data);
-		});
-		socket.on('event_mousedown', function (data) {
-			socket.broadcast.emit('event_mousedown', data);
-		});
-		socket.on('event_mouseup', function (data) {
-			socket.broadcast.emit('event_mouseup', data);
-		});
+		function getAddress(s, toStr) {
+			var addr = s.handshake.address;
+			if (toStr) {
+				return "Address[" + addr.address + ":" + addr.port+"]";
+			} else {
+				return addr;
+			}
+		}
+
+		function broadcast(name, regSocket) {
+			regSocket.on(name, function (data) {
+				regSocket.broadcast.emit(name, data);
+			});
+		}
+		broadcast('event_keydown', socket);
+		broadcast('event_keyup', socket);
+		broadcast('event_keypress', socket);
+		broadcast('event_click', socket);
+		broadcast('event_dblclick', socket);
+		broadcast('event_mousedown', socket);
+		broadcast('event_mouseup', socket);
+		
 		socket.on('query_status', function(data) {
 			// query server status，type=[online],response=query_status_{type}
-			data = extend({type: null}, data);
-			var emitName = 'query_status';
-			var query = {online: []};
-console.log("Query长度"+status.sockets.length);
-			for (var idx in status.sockets) {
-				var s = status.sockets[idx];
-				query.online.push(s.handshake.address);
-			}
-			if (data.type != null) {
-				emitName += '_' + data.type;
-				socket.emit(emitName, query[data.type]);
-			} else {
-				socket.emit(emitName, query);
+			try {
+				data = extend({type: null}, data);
+				var emitName = 'query_status';
+				var query = {online: []};
+				for (var idx in status.sockets) {
+					var s = status.sockets[idx];
+					var addr = getAddress(s, false);
+					query.online.push(addr);
+				}
+				if (data.type != null) {
+					emitName += '_' + data.type;
+					socket.emit(emitName, query[data.type]);
+				} else {
+					socket.emit(emitName, query);
+				}
+			} catch(err) {
+				console.log(err);
 			}
 		});
 		socket.on('register_event', function (registration) {
 			registration = extend({name:null, broadcast:true, handler:null}, registration);
-			console.log(registration);
+			console.log("[HTTP server] register event name=" + registration.name + ",broadcast=" + registration.broadcast);
+
 			if (registration.name == null) {
 				return;
 			}
