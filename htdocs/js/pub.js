@@ -4,8 +4,8 @@
 
 	$.fn.pubevent= function(options) {
 		var elem = this;
-		var socket = io.connect();
-		var options = options || {keyboard: true, mouse: true};
+		var options = options || {url: null, keyboard: true, mouse: true};
+		var socket = io.connect(options.url);
 		
 		var reconnect = -1;
 		socket.on('disconnect', function(){
@@ -13,7 +13,7 @@
 				reconnect = setInterval(function() {
 					console.log('socket.io try reconnect to server.');
 					socket.disconnect();
-					socket = io.connect();
+					socket = io.connect(options.url);
 				},2000);
 			}
 		});
